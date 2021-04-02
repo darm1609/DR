@@ -258,6 +258,14 @@
 			}
 			return false;
 		}
+
+		public function ejecutarConsultaUpdate($sql) 
+		{
+			if($this->query($sql)) {
+				return true;
+			}
+			return false;
+		}
         
         public function crear_log()
         {

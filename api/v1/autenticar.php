@@ -20,7 +20,7 @@
                 header('Content-Type: application/json');
                 if(isset($_POST['login']) and isset($_POST['password'])) {
                     if(!empty($_POST['login']) and !empty($_POST['password'])) {
-                        $sql="select u.Id, u.Login, p.Nombres, p.Apellidos from segusuario u inner join perpersona p on u.PersonaId=p.Id where p.ClienteId=".$clienteId." u.Login='".$_POST['login']."' and u.Password='".$_POST['password']."';";
+                        $sql="select u.Id, u.Login, p.Nombres, p.Apellidos from segusuario u inner join perpersona p on u.PersonaId=p.Id where p.ClienteId=".$clienteId." and u.Login='".$_POST['login']."' and u.Password='".$_POST['password']."';";
                         $resultadoSql=json_decode($bd->ejecutarConsultaJson($sql));
                         if(count($resultadoSql)) {
                             $resultado = array();
@@ -45,7 +45,7 @@
                 if(isset($token)) {
                     $resultado = array();
                     $token=trim(str_replace("Bearer"," ",$token));
-                    if(@Auth::Check($token) !== null) {
+                    if(@Auth::Check($token) !== null and @Auth::Check($token)) {
                         $resultado = Auth::GetData($token);
                     }
                     echo json_encode($resultado);
