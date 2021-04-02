@@ -25,9 +25,9 @@
                 case "GET":
                     $resultado = array();
                     if($_GET["id"])
-                        $sql = "select Nombre, VigenciaDesde, VigenciaHasta from vtslistadeprecio where ClienteId=".$clienteId." and Id=".$_GET["id"].";";
+                        $sql = "select Id, Nombre, VigenciaDesde, VigenciaHasta, Visible from vtslistadeprecio where ClienteId=".$clienteId." and Id=".$_GET["id"].";";
                     else
-                        $sql = "select Nombre, VigenciaDesde, VigenciaHasta from vtslistadeprecio where ClienteId=".$clienteId.";";
+                        $sql = "select Id, Nombre, VigenciaDesde, VigenciaHasta, Visible from vtslistadeprecio where ClienteId=".$clienteId.";";
                     $resultado = json_decode($bd->ejecutarConsultaJson($sql));
                     foreach ($resultado as $index => $value) {
                         $value->VigenciaDesde = date("Y-m-d",$value->VigenciaDesde);
@@ -41,8 +41,9 @@
                     if(isset($_POST["nombre"])) $nombre = trim($_POST["nombre"]);
                     if(isset($_POST["vigenciaDesde"])) $vigenciaDesde = trim($_POST["vigenciaDesde"]);
                     if(isset($_POST["vigenciaHasta"])) $vigenciaHasta = trim($_POST["vigenciaHasta"]);
-                    if(isset($nombre) and !empty($nombre) and isset($vigenciaDesde) and !empty($vigenciaDesde) and isset($vigenciaHasta) and !empty($vigenciaHasta)) {
-                        $sql = "insert into vtslistadeprecio (ClienteId, Nombre, VigenciaDesde, VigenciaHasta) values (".$clienteId.", '".$nombre."', ".$vigenciaDesde.", ".$vigenciaHasta.");";
+                    if(isset($_POST["visible"])) $visible = trim($_POST["visible"]);
+                    if(isset($nombre) and !empty($nombre) and isset($vigenciaDesde) and !empty($vigenciaDesde) and isset($vigenciaHasta) and !empty($vigenciaHasta) and isset($visible) and !empty($visible)) {
+                        $sql = "insert into vtslistadeprecio (ClienteId, Nombre, VigenciaDesde, VigenciaHasta, Visible) values (".$clienteId.", '".$nombre."', ".$vigenciaDesde.", ".$vigenciaHasta.", ".$visible.");";
                         if($bd->ejecutarConsulta($sql)) {
                             $resultado["id"] = $bd->ultimo_result;
                         }
@@ -56,17 +57,19 @@
                     if(isset($datosPUT["nombre"])) $nombre = trim($datosPUT["nombre"]);
                     if(isset($datosPUT["vigenciaDesde"])) $vigenciaDesde = trim($datosPUT["vigenciaDesde"]);
                     if(isset($datosPUT["vigenciaHasta"])) $vigenciaHasta = trim($datosPUT["vigenciaHasta"]);
+                    if(isset($datosPUT["visible"])) $visible = trim($datosPUT["visible"]);
                     if(isset($_GET["id"])) $id = trim($_GET["id"]);
-                    if(!empty($id) and (isset($nombre) or isset($vigenciaDesde) or isset($vigenciaHasta))) {
+                    if(!empty($id) and (isset($nombre) or isset($vigenciaDesde) or isset($vigenciaHasta) or isset($visible))) {
                         $sql = "update vtslistadeprecio set ";
                         if(isset($nombre) and !empty($nombre)) $sql .= "Nombre = '".$nombre."', "; else $sql .= "Nombre = Nombre, ";
                         if(isset($vigenciaDesde) and !empty($vigenciaDesde)) $sql .= "VigenciaDesde = '".$vigenciaDesde."', "; else $sql .= "VigenciaDesde = VigenciaDesde, ";
-                        if(isset($vigenciaHasta) and !empty($vigenciaHasta)) $sql .= "VigenciaHasta = '".$vigenciaHasta."'"; else $sql .= "VigenciaHasta = VigenciaHasta";
+                        if(isset($vigenciaHasta) and !empty($vigenciaHasta)) $sql .= "VigenciaHasta = '".$vigenciaHasta."', "; else $sql .= "VigenciaHasta = VigenciaHasta, ";
+                        if(isset($visible) and (!empty($visible) or $visible == 0)) $sql .= "Visible = '".$visible."'"; else $sql .= "Visible = Visible";
                         $sql .= " where ClienteId=".$clienteId." and Id=".$id.";";
                         $bd->ejecutarConsultaUpdateDelete($sql);
                     }
                     if(!empty($id)) {
-                        $sql = "select Id, Nombre, VigenciaDesde, VigenciaHasta from vtslistadeprecio where ClienteId=".$clienteId." and Id=".$id.";";
+                        $sql = "select Id, Nombre, VigenciaDesde, VigenciaHasta, Visible from vtslistadeprecio where ClienteId=".$clienteId." and Id=".$id.";";
                         $resultado = json_decode($bd->ejecutarConsultaJson($sql));
                         foreach ($resultado as $index => $value) {
                             $value->VigenciaDesde = date("Y-m-d",$value->VigenciaDesde);
