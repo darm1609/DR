@@ -68,11 +68,13 @@
                             $sql .= " where ClienteId=".$clienteId." and Id=".$id.";";
                             $bd->ejecutarConsultaUpdateDelete($sql);
                         }
-                        $sql = "select Id, Nombre, VigenciaDesde, VigenciaHasta, Visible from protipodeproducto where ClienteId=".$clienteId." and Id=".$id.";";
-                        $resultado = json_decode($bd->ejecutarConsultaJson($sql));
-                        foreach ($resultado as $index => $value) {
-                            $value->VigenciaDesde = date("Y-m-d",$value->VigenciaDesde);
-                            $value->VigenciaHasta = date("Y-m-d",$value->VigenciaHasta);
+                        if(!empty($id)) {
+                            $sql = "select Id, Nombre, VigenciaDesde, VigenciaHasta, Visible from protipodeproducto where ClienteId=".$clienteId." and Id=".$id.";";
+                            $resultado = json_decode($bd->ejecutarConsultaJson($sql));
+                            foreach ($resultado as $index => $value) {
+                                $value->VigenciaDesde = date("Y-m-d",$value->VigenciaDesde);
+                                $value->VigenciaHasta = date("Y-m-d",$value->VigenciaHasta);
+                            }
                         }
                         echo json_encode($resultado);
                         return;

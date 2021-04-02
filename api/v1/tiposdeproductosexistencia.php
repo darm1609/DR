@@ -19,7 +19,26 @@
         if(isset($headers["Authorization"]))
             $token = $headers["Authorization"];
         if(isset($token)) {
-            
+            switch($requestMethod) {
+                case "GET":
+                    $resultado = array();
+                    $resultado["nombre"] = false;
+                    if(isset($_GET["nombre"])) $nombre = trim($_GET["nombre"]);
+                    if(isset($nombre) and !empty($nombre)) {
+                        $sql = "select * from protipodeproducto where ClienteId=".$clienteId." and Nombre='".$nombre."';";
+                        if($bd->ejecutarConsultaExiste($sql))
+                            $resultado["nombre"] = true;
+                        else
+                            $resultado["nombre"] = false;
+                    }
+                    echo json_encode($resultado);
+                    return;
+                    break;
+                default:
+                    header("HTTP/1.0 405 Method Not Allowed");
+                    return;
+                    break;
+            }
         }
         $resultado = array();
         echo json_encode($resultado);
