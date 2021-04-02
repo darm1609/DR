@@ -11,8 +11,9 @@
 	<script type="text/javascript" src="CryptoJS v3.1.2/rollups/sha3.js"></script>
 	<!--Ejemplo SHA3-->
 	<script type="text/javascript">
-		//var hash = CryptoJS.SHA3("!/9ULVB!");
-		//alert(hash);
+		var hash = CryptoJS.SHA3("kRGysYCkha");
+		console.log(hash);
+		alert(hash);
 	</script>
 	<!--Fin Ejemplo SHA3-->
 	<!--Libreria alertify-->

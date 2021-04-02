@@ -3,7 +3,8 @@
     require_once("auth.php");
     require_once("config.php");
     require_once("librerias/basedatos.php");
-
+    header('Content-Type: application/json');
+    
     $requestMethod = $_SERVER["REQUEST_METHOD"];
     $headers=array();
     foreach (getallheaders() as $name => $value) {
@@ -18,10 +19,7 @@
         if(isset($headers["Authorization"]))
             $token = $headers["Authorization"];
         if(isset($token)) {
-            $token=trim(str_replace("Bearer"," ",$token));
-            if(@Auth::Check($token) !== null and @Auth::Check($token)) {
-                
-            }
+            
         }
         $resultado = array();
         echo json_encode($resultado);

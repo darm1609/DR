@@ -259,7 +259,7 @@
 			return false;
 		}
 
-		public function ejecutarConsultaUpdate($sql) 
+		public function ejecutarConsultaUpdateDelete($sql) 
 		{
 			if($this->query($sql)) {
 				return true;
