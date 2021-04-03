@@ -15,15 +15,40 @@
     $bd=new BaseDatos($servidor,$puerto,$usuario,$pass,$basedatos);
 	if($bd->conectado)
 	{
-        if(isset($headers["Authorization"]))
-            $token = $headers["Authorization"];
-        if(isset($token)) {
-            $token=trim(str_replace("Bearer"," ",$token));
-            if(@Auth::Check($token) !== null and @Auth::Check($token)) {
-                switch($requestMethod) {
-                    case "POST":
-                        header('Content-Type: application/json');
-                        $resultado = array();
+        switch($requestMethod) {
+            case "GET":
+                header('Content-Type: application/json');
+                $resultado = array();
+                if(isset($_GET["id"])) $id = trim($_GET["id"]);
+                if(isset($id) and !empty($id)) 
+                    $sql = "select p.Id, p.TipoDeProductoId, tp.Nombre TipoDeProducto, p.Nombre Producto, p.VigenciaDesde, p.VigenciaHasta, p.Visible, p.Disponible, p.Descripcion, p.AdjuntoId, p.ListaDePrecioId, 0 ListaDePrecio from proproducto p inner join protipodeproducto tp on p.TipoDeProductoId=tp.Id where p.Id=".$id.";";
+                else
+                    $sql = "select p.Id, p.TipoDeProductoId, tp.Nombre TipoDeProducto, p.Nombre Producto, p.VigenciaDesde, p.VigenciaHasta, p.Visible, p.Disponible, p.Descripcion, p.AdjuntoId, p.ListaDePrecioId, 0 ListaDePrecio from proproducto p inner join protipodeproducto tp on p.TipoDeProductoId=tp.Id;";
+                $resultado = json_decode($bd->ejecutarConsultaJson($sql));
+                foreach ($resultado as $index => $value) {
+                    $value->VigenciaDesde = date("Y-m-d",$value->VigenciaDesde);
+                    $value->VigenciaHasta = date("Y-m-d",$value->VigenciaHasta);
+                    $value->ListaDePrecio = [];
+                    $resultado2 = array();
+                    $sql = "select pl.ListaDePrecioId Id, l.Nombre, pl.VigenciaDesde, pl.VigenciaHasta, pl.Precio from vtsproductodelistadeprecio pl inner join vtslistadeprecio l on pl.ListaDePrecioId=l.Id where pl.ProductoId=".$value->Id.";";
+                    $resultado2 = json_decode($bd->ejecutarConsultaJson($sql));
+                    foreach ($resultado2 as $index2 => $value2) {
+                        $value2->VigenciaDesde = date("Y-m-d",$value2->VigenciaDesde);
+                        $value2->VigenciaHasta = date("Y-m-d",$value2->VigenciaHasta);
+                    }
+                    $value->ListaDePrecio = $resultado2;
+                }
+                echo json_encode($resultado);
+                return;
+                break;
+            case "POST":
+                header('Content-Type: application/json');
+                $resultado = array();
+                if(isset($headers["Authorization"]))
+                    $token = $headers["Authorization"];
+                if(isset($token)) {
+                    $token=trim(str_replace("Bearer"," ",$token));
+                    if(@Auth::Check($token) !== null and @Auth::Check($token)) {
                         if(isset($_POST["tipoDeProductoId"])) $tipoDeProductoId = trim($_POST["tipoDeProductoId"]);
                         if(isset($_POST["nombre"])) $nombre = trim($_POST["nombre"]);
                         if(isset($_POST["vigenciaDesde"])) $vigenciaDesde = trim($_POST["vigenciaDesde"]);
@@ -56,12 +81,19 @@
                                 } 
                             }
                         }
-                        echo json_encode($resultado);
-                        return;
-                        break;
-                    case "PUT":
-                        header('Content-Type: application/json');
-                        $resultado = array();
+                    }
+                }
+                echo json_encode($resultado);
+                return;
+                break;
+            case "PUT":
+                header('Content-Type: application/json');
+                $resultado = array();
+                if(isset($headers["Authorization"]))
+                    $token = $headers["Authorization"];
+                if(isset($token)) {
+                    $token=trim(str_replace("Bearer"," ",$token));
+                    if(@Auth::Check($token) !== null and @Auth::Check($token)) {
                         parse_str(file_get_contents("php://input"), $datosPUT);
                         if(isset($datosPUT["tipoDeProductoId"])) $tipoDeProductoId = trim($datosPUT["tipoDeProductoId"]);
                         if(isset($datosPUT["nombre"])) $nombre = trim($datosPUT["nombre"]);
@@ -112,7 +144,7 @@
                             }
                             $resultado[0]->ListaDePrecio = [];
                             $resultado2 = Array();
-                            $sql = "select pl.ListaDePrecioId Id, l.Nombre, pl.VigenciaDesde, pl.VigenciaHasta, pl.Precio from vtsproductodelistadeprecio pl inner join vtslistadeprecio l on pl.ListaDePrecioId=l.Id where pl.ListaDePrecioId=".$listaDePrecioId." and pl.ProductoId=".$id.";";
+                            $sql = "select pl.ListaDePrecioId Id, l.Nombre, pl.VigenciaDesde, pl.VigenciaHasta, pl.Precio from vtsproductodelistadeprecio pl inner join vtslistadeprecio l on pl.ListaDePrecioId=l.Id where pl.ProductoId=".$id.";";
                             $resultado2 = json_decode($bd->ejecutarConsultaJson($sql));
                             foreach ($resultado2 as $index => $value) {
                                 $value->VigenciaDesde = date("Y-m-d",$value->VigenciaDesde);
@@ -120,15 +152,15 @@
                             }
                             $resultado[0]->ListaDePrecio = $resultado2;
                         }
-                        echo json_encode($resultado);
-                        return;
-                        break;
-                    default:
-                        header("HTTP/1.0 405 Method Not Allowed");
-                        return;
-                        break;
+                    }
                 }
-            }
+                echo json_encode($resultado);
+                return;
+                break;
+            default:
+                header("HTTP/1.0 405 Method Not Allowed");
+                return;
+                break;
         }
         $resultado = array();
         echo json_encode($resultado);
