@@ -14,5 +14,5 @@
 	$clienteId=1;
 	$rutaDeAdjuntos="adjuntos/";
 	ini_set("display_errors","On");
-	date_default_timezone_set("America/Caracas");
+	date_default_timezone_set("America/Bogota");
 ?>
